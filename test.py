@@ -2,4 +2,4 @@
 from utils import Preprocessing
 
 p = Preprocessing()
-p.load_images()
+p.make_average_pooled_image("train-input")
