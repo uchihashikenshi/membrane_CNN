@@ -16,6 +16,17 @@ memCNN_home = os.getcwd() # projects/memCNNから走らせる予定
 Annotation
 data_type: trainingとかtestとか
 data_dir: データを入れてるディレクトリの名前。data/raw/(data_type)/まではprefix
+
+ディレクトリ構造:
+data---raw--------------------train-input
+     |     |------------------test-input
+     |-preprocessed_dataset---training------median_extract_training_dataset
+     |                      |          |----pooled_training_dataset
+     |                      |-test----------median_extract_test_dataset
+     |                                 |----pooled_test_dataset
+     |-training_dataset
+     |-test-dataset
+     |-lmdb
 """
 class Preprocessing(object):
     def __init__(self):
@@ -35,8 +46,8 @@ class Preprocessing(object):
     def make_median_extracted_dataset(self, data_type, data_dir):
         filelist = self.load_images(data_dir)
 
-        if os.path.exists("%s/data/%s_dataset/median_extract_%s_dataset" % (memCNN_home, data_type, data_type)) != True:
-            os.mkdir("%s/data/%s_dataset/median_extract_%s_dataset" % (memCNN_home, data_type, data_type)) # データ置き場用意
+        if os.path.exists("%s/data/preprocessed/%s/median_extract_%s_dataset" % (memCNN_home, data_type, data_type)) != True:
+            os.mkdir("%s/data/preprocessed/%s/median_extract_%s_dataset" % (memCNN_home, data_type, data_type)) # データ置き場用意
 
         # スタック中全画像からmedianを求める(medianの平均値)
         # fixme: medianの平均でいいのか・・・？
@@ -63,7 +74,7 @@ class Preprocessing(object):
                         median_extract_matrix[i][j] = 0
 
             median_extract_image = Image.fromarray(np.uint8(median_extract_matrix).reshape(1024, 1024))
-            median_extract_image.save("%s/data/%s_dataset/median_extract_%s_dataset/median_extract_image_%03d.tif" % (memCNN_home, data_type, data_type, file_num))
+            median_extract_image.save("%s/data/preprocessed/%s/median_extract_%s_dataset/median_extract_image_%03d.tif" % (memCNN_home, data_type, data_type, file_num))
             file_num += 1
             if file_num % 10 == 0:
                 print("%s epoch ended" % file_num)
@@ -72,8 +83,8 @@ class Preprocessing(object):
     def make_average_pooled_dataset(self, data_type, data_dir):
         filelist = self.load_images(data_dir)
 
-        if os.path.exists("%s/data/%s_dataset/pooled_%s_dataset" % (memCNN_home, data_type, data_type)) != True:
-            os.mkdir("%s/data/%s_dataset/pooled_%s_dataset" % (memCNN_home, data_type, data_type)) # データ置き場用意
+        if os.path.exists("%s/data/preprocessed/%s/pooled_%s_dataset" % (memCNN_home, data_type, data_type)) != True:
+            os.mkdir("%s/data/preprocessed/%s/pooled_%s_dataset" % (memCNN_home, data_type, data_type)) # データ置き場用意
 
         file_num = 1
         for file in filelist:
@@ -88,8 +99,14 @@ class Preprocessing(object):
                     pooled_pixel = _sum / 16
                     pooled_matrix.append(pooled_pixel)
             pooled_image = Image.fromarray(np.uint8(pooled_matrix).reshape(256, 256))
-            pooled_image.save("%s/data/%s_dataset/pooled_%s_dataset/pooled_image_%03d.tif" % (memCNN_home, data_type, data_type, file_num))
+            pooled_image.save("%s/data/preprocessed/%s/pooled_%s_dataset/pooled_image_%03d.tif" % (memCNN_home, data_type, data_type, file_num))
             file_num += 1
             if file_num % 10 == 0:
                 print("%s epoch ended" % file_num)
         print("pooled_%s_dataset is created" % data_type)
+
+    # def patch_extract(self, data_type, data_dir):
+    #     filelist = self.load_images(data_dir)
+    #
+    #     if os.path.exists("%s/data/%s_dataset/_%s_dataset" % (memCNN_home, data_type, data_type)) != True:
+    #         os.mkdir("%s/data/%s_dataset/pooled_%s_dataset" % (memCNN_home, data_type, data_type)) # データ置き場用意
