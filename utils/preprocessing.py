@@ -20,6 +20,7 @@ data_dir: データを入れてるディレクトリの名前。data/raw/(data_t
 ディレクトリ構造:
 data---raw--------------------train-input
      |     |------------------test-input
+     |     |------------------train-labels
      |-preprocessed_dataset---training------median_extract_training_dataset
      |                      |          |----pooled_training_dataset
      |                      |-test----------median_extract_test_dataset
@@ -105,8 +106,27 @@ class Preprocessing(object):
                 print("%s epoch ended" % file_num)
         print("pooled_%s_dataset is created" % data_type)
 
-    # def patch_extract(self, data_type, data_dir):
-    #     filelist = self.load_images(data_dir)
-    #
-    #     if os.path.exists("%s/data/%s_dataset/_%s_dataset" % (memCNN_home, data_type, data_type)) != True:
-    #         os.mkdir("%s/data/%s_dataset/pooled_%s_dataset" % (memCNN_home, data_type, data_type)) # データ置き場用意
+    def patch_extract(self, data_type, data_dir, label_data_dir, image_size = 256, crop_size = 33, stride = 5):
+        filelist = self.load_images(data_dir)
+        labellist = self.load_images(label_data_dir)
+        f = open("%s/data/%s_dataset/%s.txt" % (memCNN_home, data_type, data_type), 'w')
+        center = (crop_size - 1) / 2
+
+        if os.path.exists("%s/data/%s_dataset" % (memCNN_home, data_type)) != True:
+            os.mkdir("%s/data/%s_dataset" % (memCNN_home, data_type)) # データ置き場用意
+
+        file_index = 1
+        for file, label in zip(filelist, labellist):
+            # 縦横の切り取り回数を計算(適当)
+            for h in range(int((image_size - crop_size) / stride)):
+                for w in range(int((image_size - crop_size) / stride)):
+                    # 画像のサイズを指定
+                    patch_range = (w * stride, h * stride, w * stride + crop_size, h * stride + crop_size)
+                    cropped_image = Image.open("%s/data/%s/%s" % (memCNN_home, data_dir, file)).crop(patch_range)
+                    cropped_label = Image.open("%s/data/%s/%s" % (memCNN_home, label_data_dir, label)).crop(patch_range)
+                    ans = np.array(list((cropped_label.getdata()))).reshape((crop_size, crop_size))[center][center]
+                    cropped_image.save("%s/data/%s_dataset/%s_image_%03d%03d%03d.tif" % (memCNN_home, data_type, data_type, file_index, h, w))
+                    f.write("%s_image_%03d%03d%03d.tif %s\n" % (data_type, file_index, h, w, ans))
+            if file_index % 10 == 0:
+                print("%s epoch ended" % file_index)
+            file_index += 1
