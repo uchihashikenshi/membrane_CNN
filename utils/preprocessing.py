@@ -119,23 +119,23 @@ class Preprocessing(object):
         center = (crop_size - 1) / 2
 
         # training dastaset作成
-        if os.path.exists("%s/data/%straining_dataset" % (memCNN_home, prefix)) != True:
-            os.mkdir("%s/data/%straining_dataset" % (memCNN_home, prefix)) # trainingデータ置き場用意
+        if os.path.exists("%s/data/training_dataset/%straining_dataset" % (memCNN_home, prefix)) != True:
+            os.mkdir("%s/data/training_dataset/%straining_dataset" % (memCNN_home, prefix)) # trainingデータ置き場用意
         else:
             # 既にdatasetが存在すればエラーを返す
-            print("%s/data/%straining_dataset already exist." % (memCNN_home, prefix))
+            print("%s/data/training_dataset/%straining_dataset already exist." % (memCNN_home, prefix))
             return
         # test dataset作成
-        if os.path.exists("%s/data/%stest_dataset" % (memCNN_home, prefix)) != True:
-            os.mkdir("%s/data/%stest_dataset" % (memCNN_home, prefix)) # testデータ置き場用意
+        if os.path.exists("%s/data/test_dataset/%stest_dataset" % (memCNN_home, prefix)) != True:
+            os.mkdir("%s/data/test_dataset/%stest_dataset" % (memCNN_home, prefix)) # testデータ置き場用意
         else:
             # 既にdatasetが存在すればエラーを返す
-            print("%s/data/%stest_dataset already exist." % (memCNN_home, prefix))
+            print("%s/data/test_dataset/%stest_dataset already exist." % (memCNN_home, prefix))
             return
 
         # trainig, testのデータベース作成用txt(名前は全てtraining.txt, test.txt)
-        training_f = open("%s/data/%straining_dataset/training.txt" % (memCNN_home, prefix), 'w')
-        test_f = open("%s/data/%stest_dataset/test.txt" % (memCNN_home, prefix), 'w')
+        training_f = open("%s/data/training_dataset/%straining_dataset/training.txt" % (memCNN_home, prefix), 'w')
+        test_f = open("%s/data/test_dataset/%stest_dataset/test.txt" % (memCNN_home, prefix), 'w')
 
         file_index = 1
         for file, label in zip(filelist, labellist):
@@ -151,10 +151,10 @@ class Preprocessing(object):
 
                     # 保存部分
                     if file_index <= 80:
-                        cropped_image.save("%s/data/%straining_dataset/%straining_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
+                        cropped_image.save("%s/data/training_dataset/%straining_dataset/%straining_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
                         training_f.write("%straining_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
                     else:
-                        cropped_image.save("%s/data/%stest_dataset/%stest_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
+                        cropped_image.save("%s/data/test_dataset/%stest_dataset/%stest_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
                         test_f.write("%stest_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
             if file_index % 10 == 0:
                 print("%s images ended" % file_index)
