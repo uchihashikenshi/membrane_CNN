@@ -152,10 +152,10 @@ class Preprocessing(object):
                     # 保存部分
                     if file_index <= 80:
                         cropped_image.save("%s/data/%straining_dataset/%straining_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
-                        training_f.write("%s_image_%03d%03d%03d.tif %s\n" % (data_type, file_index, h, w, ans))
+                        training_f.write("%straining_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
                     else:
                         cropped_image.save("%s/data/%stest_dataset/%stest_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
-                        test_f.write("%s_image_%03d%03d%03d.tif %s\n" % (data_type, file_index, h, w, ans))
+                        test_f.write("%stest_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
             if file_index % 10 == 0:
                 print("%s images ended" % file_index)
 
