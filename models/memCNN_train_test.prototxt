@@ -5,7 +5,7 @@ layers {
   top: "data"
   top: "label"
   data_param {
-    source: "data/EM_dataset/train_lmdb"
+    source: "data/EM_dataset/separated_training_lmdb"
     backend: LMDB
     batch_size: 64
   }
@@ -17,7 +17,7 @@ layers {
   top: "data"
   top: "label"
   data_param {
-    source: "data/EM_dataset/test_lmdb"
+    source: "data/EM_dataset/separated_test_lmdb"
     backend: LMDB
     batch_size: 100
   }
