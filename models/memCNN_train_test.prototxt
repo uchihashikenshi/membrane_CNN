@@ -5,7 +5,7 @@ layers {
   top: "data"
   top: "label"
   data_param {
-    source: "data/EM_dataset/separated_training_lmdb"
+    source: "data/lmdb/training/separated_training_lmdb"
     backend: LMDB
     batch_size: 64
   }
@@ -17,7 +17,7 @@ layers {
   top: "data"
   top: "label"
   data_param {
-    source: "data/EM_dataset/separated_test_lmdb"
+    source: "data/lmdb/test/separated_test_lmdb"
     backend: LMDB
     batch_size: 100
   }
@@ -104,7 +104,7 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   inner_product_param {
-    num_output: 100
+    num_output: 10
     weight_filler {
       type: "xavier"
     }
@@ -114,40 +114,17 @@ layers {
   }
 }
 layers {
-  name: "relu3"
-  type: RELU
+  name: "accuracy"
+  type: SOFTMAX_LOSS
   bottom: "ip1"
-  top: "ip1"
+  bottom: "label"
+  top: "accuracy"
+  include: { phase: TEST }
 }
-layers {
-  name: "ip2"
-  type: INNER_PRODUCT
-  bottom: "ip1"
-  top: "ip2"
-  blobs_lr: 1
-  blobs_lr: 2
-  inner_product_param {
-    num_output: 1
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-#layers {
-#  name: "accuracy"
-#  type: EUCLIDEAN_LOSS
-#  bottom: "ip2"
-#  bottom: "label"
-#  top: "accuracy"
-#  include: { phase: TEST }
-#}
 layers {
   name: "loss"
-  type: EUCLIDEAN_LOSS
-  bottom: "ip2"
+  type: SOFTMAX_LOSS
+  bottom: "ip1"
   bottom: "label"
   top: "loss"
 }
