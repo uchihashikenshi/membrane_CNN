@@ -116,10 +116,6 @@ class Preprocessing(object):
         filelist = self.load_images(data_dir)
         labellist = self.load_images(label_data_dir)
 
-        # trainig, testのデータベース作成用txt(名前は全てtraining.txt, test.txt)
-        training_f = open("%s/data/%straining_dataset/training.txt" % (memCNN_home, prefix), 'w')
-        test_f = open("%s/data/%stest_dataset/test.txt" % (memCNN_home, prefix), 'w')
-
         center = (crop_size - 1) / 2
 
         # training dastaset作成
@@ -136,6 +132,10 @@ class Preprocessing(object):
             # 既にdatasetが存在すればエラーを返す
             print("%s/data/%stest_dataset already exist." % (memCNN_home, prefix))
             return
+
+        # trainig, testのデータベース作成用txt(名前は全てtraining.txt, test.txt)
+        training_f = open("%s/data/%straining_dataset/training.txt" % (memCNN_home, prefix), 'w')
+        test_f = open("%s/data/%stest_dataset/test.txt" % (memCNN_home, prefix), 'w')
 
         file_index = 1
         for file, label in zip(filelist, labellist):
