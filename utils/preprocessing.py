@@ -106,7 +106,7 @@ class Preprocessing(object):
                 print("%s images ended" % file_num)
         print("pooled_%s_dataset is created." % data_type)
 
-    def patch_extract(self, data_type, data_dir, label_data_dir, prefix = "", image_size = 256, crop_size = 33, stride = 5):
+    def patch_extract(self, data_dir, label_data_dir, prefix = "", image_size = 256, crop_size = 33, stride = 5):
         """
         1 stackをtraining 80枚、test20枚に分ける
 
@@ -147,7 +147,7 @@ class Preprocessing(object):
                     patch_range = (w * stride, h * stride, w * stride + crop_size, h * stride + crop_size)
                     cropped_image = Image.open("%s/data/%s/%s" % (memCNN_home, data_dir, file)).crop(patch_range)
                     cropped_label = Image.open("%s/data/%s/%s" % (memCNN_home, label_data_dir, label)).crop(patch_range)
-                    ans = np.array(list((cropped_label.getdata()))).reshape((crop_size, crop_size))[center][center]
+                    ans = int(np.array(list((cropped_label.getdata()))).reshape((crop_size, crop_size))[center][center] / 255)
 
                     # 保存部分
                     if file_index <= 80:
