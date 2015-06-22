@@ -35,5 +35,6 @@ build
 python
 src
 
-
+*.caffemodel
+*.solverstate
 
