@@ -78,8 +78,8 @@ class Preprocessing(object):
             median_extract_image.save("%s/data/preprocessed/%s/median_extract_%s_dataset/median_extract_image_%03d.tif" % (memCNN_home, data_type, data_type, file_num))
             file_num += 1
             if file_num % 10 == 0:
-                print("%s images ended" % file_num)
-        print("median_extract_%s_dataset is created." % data_type)
+                print "%s images ended" % file_num
+        print "median_extract_%s_dataset is created." % data_type
 
     def make_average_pooled_dataset(self, data_type, data_dir):
         filelist = self.load_images(data_dir)
@@ -103,8 +103,8 @@ class Preprocessing(object):
             pooled_image.save("%s/data/preprocessed/%s/pooled_%s_dataset/pooled_image_%03d.tif" % (memCNN_home, data_type, data_type, file_num))
             file_num += 1
             if file_num % 10 == 0:
-                print("%s images ended" % file_num)
-        print("pooled_%s_dataset is created." % data_type)
+                print "%s images ended" % file_num
+        print "pooled_%s_dataset is created." % data_type
 
     def patch_extract(self, data_dir, label_data_dir, prefix = "", image_size = 256, crop_size = 33, stride = 5):
         """
@@ -120,14 +120,14 @@ class Preprocessing(object):
             os.mkdir("%s/data/training_dataset/%straining_dataset" % (memCNN_home, prefix)) # trainingデータ置き場用意
         else:
             # 既にdatasetが存在すればエラーを返す
-            print("%s/data/training_dataset/%straining_dataset already exist." % (memCNN_home, prefix))
+            print "%s/data/training_dataset/%straining_dataset already exist." % (memCNN_home, prefix)
             return
         # test dataset作成
         if os.path.exists("%s/data/test_dataset/%stest_dataset" % (memCNN_home, prefix)) != True:
             os.mkdir("%s/data/test_dataset/%stest_dataset" % (memCNN_home, prefix)) # testデータ置き場用意
         else:
             # 既にdatasetが存在すればエラーを返す
-            print("%s/data/test_dataset/%stest_dataset already exist." % (memCNN_home, prefix))
+            print "%s/data/test_dataset/%stest_dataset already exist." % (memCNN_home, prefix)
             return
 
         # trainig, testのデータベース作成用txt(名前は全てtraining.txt, test.txt)
@@ -135,6 +135,8 @@ class Preprocessing(object):
         test_f = open("%s/data/test_dataset/%stest_dataset/test.txt" % (memCNN_home, prefix), 'w')
 
         file_index = 1
+        # 正例・負例の数をそれぞれ数える処理
+        ans_0_number, ans_1_number = (0, 0)
         for file, label in zip(filelist, labellist):
             # 縦横の切り取り回数を計算(適当)
             for h in range(int((image_size - crop_size) / stride)):
@@ -146,18 +148,30 @@ class Preprocessing(object):
                     cropped_label = Image.open("%s/data/%s/%s" % (memCNN_home, label_data_dir, label)).crop(patch_range)
                     ans = int(np.array(list((cropped_label.getdata()))).reshape((crop_size, crop_size))[center][center] / 255)
 
-                    # 保存部分
-                    if file_index <= 80:
-                        cropped_image.save("%s/data/training_dataset/%straining_dataset/%straining_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
-                        training_f.write("%straining_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
+                    # 正例・負例を同数にする処理
+                    if ans == 0:
+                        ans_0_number += 1
                     else:
-                        cropped_image.save("%s/data/test_dataset/%stest_dataset/%stest_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
-                        test_f.write("%stest_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
+                        ans_1_number += 1
+
+                    if ans_0_number > ans_1_number:
+                        #通常の保存処理
+                        # 保存部分
+                        if file_index <= 80:
+                            cropped_image.save("%s/data/training_dataset/%straining_dataset/%straining_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
+                            training_f.write("%straining_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
+                        else:
+                            cropped_image.save("%s/data/test_dataset/%stest_dataset/%stest_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
+                            test_f.write("%stest_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
+
             if file_index % 10 == 0:
-                print("%s images ended" % file_index)
+                print "%s images ended" % file_index
 
             if file_index == 80:
-                print("%straining_dataset is created." % prefix)
+                print "%straining_dataset is created." % prefix
+                #debug:
+                print ans_0_number
+                print ans_1_number
             if file_index == 100:
-                print("%stest_dataset is created." % prefix)
+                print "%stest_dataset is created." % prefix
             file_index += 1
