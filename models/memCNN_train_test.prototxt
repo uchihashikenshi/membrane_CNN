@@ -104,7 +104,7 @@ layers {
   blobs_lr: 1
   blobs_lr: 2
   inner_product_param {
-    num_output: 10
+    num_output: 2
     weight_filler {
       type: "xavier"
     }
@@ -115,7 +115,7 @@ layers {
 }
 layers {
   name: "accuracy"
-  type: SOFTMAX_LOSS
+  type: ACCURACY
   bottom: "ip1"
   bottom: "label"
   top: "accuracy"
