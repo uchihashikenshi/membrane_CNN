@@ -29,7 +29,7 @@ data---raw--------------------train-input
      |-test-dataset
      |-lmdb
 """
-class Preprocessing(object):
+class Preprocessing_python2(object):
     def __init__(self):
         pass
 
