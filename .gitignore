@@ -1,4 +1,5 @@
 data/
+test.py
 
 # Compiled Object files
 *.slo
@@ -37,4 +38,3 @@ src
 
 *.caffemodel
 *.solverstate
-
