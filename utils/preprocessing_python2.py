@@ -148,13 +148,7 @@ class Preprocessing_python2(object):
                     cropped_label = Image.open("%s/data/%s/%s" % (memCNN_home, label_data_dir, label)).crop(patch_range)
                     ans = int(np.array(list((cropped_label.getdata()))).reshape((crop_size, crop_size))[center][center] / 255)
 
-                    # 正例・負例を同数にする処理
-                    if ans == 0:
-                        ans_0_number += 1
-                    else:
-                        ans_1_number += 1
-
-                    if ans_0_number > ans_1_number:
+                    if (ans_0_number >= ans_1_number and ans == 1) or (ans_0_number <= ans_1_number and ans == 0):
                         #通常の保存処理
                         # 保存部分
                         if file_index <= 80:
@@ -163,6 +157,11 @@ class Preprocessing_python2(object):
                         else:
                             cropped_image.save("%s/data/test_dataset/%stest_dataset/%stest_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
                             test_f.write("%stest_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
+                        # 正例・負例を同数にする処理
+                        if ans == 0:
+                            ans_0_number += 1
+                        else:
+                            ans_1_number += 1
 
             if file_index % 10 == 0:
                 print "%s images ended" % file_index
