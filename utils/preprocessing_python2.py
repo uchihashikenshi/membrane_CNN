@@ -129,18 +129,27 @@ class Preprocessing_python2(object):
             # 既にdatasetが存在すればエラーを返す
             print "%s/data/test_dataset/%stest_dataset already exist." % (memCNN_home, prefix)
             return
+        # reconstruction test dataset作成
+        if os.path.exists("%s/data/test_dataset/reconstruction_%stest_dataset" % (memCNN_home, prefix)) != True:
+            os.mkdir("%s/data/test_dataset/reconstruction_%stest_dataset" % (memCNN_home, prefix)) # testデータ置き場用意
+        else:
+            # 既にdatasetが存在すればエラーを返す
+            print "%s/data/test_dataset/reconstruction_%stest_dataset already exist." % (memCNN_home, prefix)
+            return
 
         # trainig, testのデータベース作成用txt(名前は全てtraining.txt, test.txt)
         training_f = open("%s/data/training_dataset/%straining_dataset/training.txt" % (memCNN_home, prefix), 'w')
         test_f = open("%s/data/test_dataset/%stest_dataset/test.txt" % (memCNN_home, prefix), 'w')
+        # reconstruction testのデータベース作成用txt(名前は全てtraining.txt, test.txt)
+        reconstruction_test_f = open("%s/data/test_dataset/reconstruction_%stest_dataset/test.txt" % (memCNN_home, prefix), 'w')
 
         file_index = 1
         # 正例・負例の数をそれぞれ数える処理
         ans_0_number, ans_1_number = (0, 0)
         for file, label in zip(filelist, labellist):
             # 縦横の切り取り回数を計算(適当)
-            for h in range(int((image_size - crop_size) / stride)):
-                for w in range(int((image_size - crop_size) / stride)):
+            for h in xrange(int((image_size - crop_size) / stride)):
+                for w in xrange(int((image_size - crop_size) / stride)):
 
                     # 画像のサイズを指定
                     patch_range = (w * stride, h * stride, w * stride + crop_size, h * stride + crop_size)
@@ -162,6 +171,17 @@ class Preprocessing_python2(object):
                             ans_0_number += 1
                         else:
                             ans_1_number += 1
+
+            if file_index == 90:
+                for h in xrange(int(image_size - crop_size)):
+                    for w in xrange(int(image_size - crop_size)):
+                        # 画像のサイズを指定
+                        patch_range = (w, h, w + crop_size, h + crop_size)
+                        cropped_image = Image.open("%s/data/%s/%s" % (memCNN_home, data_dir, file)).crop(patch_range)
+                        cropped_label = Image.open("%s/data/%s/%s" % (memCNN_home, label_data_dir, label)).crop(patch_range)
+                        ans = int(np.array(list((cropped_label.getdata()))).reshape((crop_size, crop_size))[center][center] / 255)
+                        cropped_image.save("%s/data/test_dataset/reconstruction_%stest_dataset/reconstruction_%stest_image_%03d%03d%03d.tif" % (memCNN_home, prefix, prefix, file_index, h, w))
+                        reconstruction_test_f.write("reconstruction_%stest_image_%03d%03d%03d.tif %s\n" % (prefix, file_index, h, w, ans))
 
             if file_index % 10 == 0:
                 print "%s images ended" % file_index
